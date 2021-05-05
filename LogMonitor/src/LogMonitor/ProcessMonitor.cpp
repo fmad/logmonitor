@@ -4,6 +4,7 @@
 //
 
 #include "pch.h"
+#include <condition_variable>
 
 using namespace std;
 
@@ -145,6 +146,7 @@ void CreateChildProcess(std::wstring& Cmdline)
                 Utility::FormatString(L"Process monitor error. Failed to get entrypoint process exit code. Error: %d", GetLastError()).c_str()
             );
         }
+        WaitBeforeExit();
 
         //
         // Close handles to the child process and its primary thread.
@@ -191,4 +193,23 @@ DWORD ReadFromPipe(LPVOID Param)
     }
 
     return ERROR_SUCCESS;
+}
+
+static bool waitInProgress = false;
+std::mutex myWIPMutex;
+
+void WaitBeforeExit()
+{
+    int secs = 10;
+    const std::lock_guard<std::mutex> lock(myWIPMutex);
+    if ( ! waitInProgress ) {
+        waitInProgress = true;
+        logWriter.TraceInfo(
+            Utility::FormatString(L"Waiting %d seconds after program exit.", secs).c_str()
+        );
+        do {
+            Sleep(1000);
+        } while (secs-- > 0);
+        logWriter.TraceInfo(L"Done waiting after program exit.");
+    }
 }

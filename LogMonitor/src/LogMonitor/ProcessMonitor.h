@@ -6,4 +6,4 @@
 #pragma once
 
 DWORD CreateAndMonitorProcess(std::wstring& Cmdline);
-
+void WaitBeforeExit();
