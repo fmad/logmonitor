@@ -5,6 +5,7 @@
 
 #include "pch.h"
 #include "Version.h"
+#include "Main.h"
 
 using namespace std;
 
@@ -38,6 +39,9 @@ BOOL ControlHandle(_In_ DWORD dwCtrlType)
         case CTRL_SHUTDOWN_EVENT:
         {
             wprintf(L"\nCTRL signal received. The process will now terminate.\n");
+
+            logWriter.TraceInfo(L"CTRL signal received.\n");
+            WaitBeforeExit();
 
             SetEvent(g_hStopEvent);
             g_hStopEvent = INVALID_HANDLE_VALUE;
