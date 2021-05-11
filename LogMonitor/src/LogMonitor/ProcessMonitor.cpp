@@ -200,16 +200,14 @@ std::mutex myWIPMutex;
 
 void WaitBeforeExit()
 {
-    int secs = 10;
+    int secs = 5;
     const std::lock_guard<std::mutex> lock(myWIPMutex);
     if ( ! waitInProgress ) {
         waitInProgress = true;
         logWriter.TraceInfo(
             Utility::FormatString(L"Waiting %d seconds after program exit.", secs).c_str()
         );
-        do {
-            Sleep(1000);
-        } while (secs-- > 0);
+        Sleep(secs*1000-100); // Secs - 100ms
         logWriter.TraceInfo(L"Done waiting after program exit.");
     }
 }
